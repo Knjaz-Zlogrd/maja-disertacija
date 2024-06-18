@@ -1,15 +1,24 @@
-import React from 'react';
+import React, { useState } from 'react';
 import LoginScreen from './screens/Login';
 
+type User = {
+  email: string,
+}
+
 function App() {
+  const [user, setUser] = useState<User | null>(null);
+
   const handleLogin = (email: string, password: string) => {
-    // TO DO: Add Firebase login logic here
-    console.log('Login attempt', { email, password });
+    setUser({email})
   };
 
   return (
     <div className="App">
-       <LoginScreen onLogin={handleLogin} />
+      {user ? (
+        <div>Welcome, {user.email}!</div>
+      ) : (
+        <LoginScreen onLogin={handleLogin} />
+      )}
     </div>
   );
 }
