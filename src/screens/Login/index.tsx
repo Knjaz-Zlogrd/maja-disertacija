@@ -1,24 +1,50 @@
 import React, { useState } from 'react';
 import { loginWithEmailAndPassword, registerWithEmailAndPassword } from '../../auth';
+import { addAuthToken, addUID, setError, setLoading } from '../../store/loginSlice';
+import { useAppDispatch } from '../../store';
+import { useNavigate } from 'react-router-dom';
 
 type LoginScreenProps = {
-  onLogin: (email: string, password: string) => void;
+  onLogin: (email: string) => void;
 }
 
-const LoginScreen = ({onLogin}: LoginScreenProps) => {
+const Login = ({onLogin}: LoginScreenProps) => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isRegistering, setIsRegistering] = useState(false);
 
 
+  // const handleLogin = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   try {
+  //     const user = await loginWithEmailAndPassword(email, password);
+  //     console.log('User logged in:', user);
+  //     onLogin(email);
+  //   } catch (error) {
+  //     console.error('Error logging in:', error);
+  //   }
+  // };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    dispatch(setLoading(true));
     try {
       const user = await loginWithEmailAndPassword(email, password);
-      console.log('User logged in:', user);
-      onLogin(email, password);
+      const token = await user.getIdToken();
+      const uid = user.uid;
+
+      dispatch(addUID(uid));
+      dispatch(addAuthToken(token));
+      dispatch(setLoading(false));
+      onLogin(email);
+      navigate('/home');
     } catch (error) {
-      console.error('Error logging in:', error);
+      console.log('Unable to login.', error);
+      dispatch(setError('Login failed. Please try again.'));
+      dispatch(setLoading(false));
     }
   };
 
@@ -27,7 +53,8 @@ const LoginScreen = ({onLogin}: LoginScreenProps) => {
     try {
       const user = await registerWithEmailAndPassword(email, password);
       console.log('User registered:', user);
-      onLogin(email, password);
+      onLogin(email);
+
     } catch (error) {
       console.error('Error registering:', error);
     }
@@ -91,4 +118,4 @@ const LoginScreen = ({onLogin}: LoginScreenProps) => {
   );
 };
 
-export default LoginScreen;
+export default Login;

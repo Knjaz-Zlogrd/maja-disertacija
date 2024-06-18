@@ -1,24 +1,32 @@
 import React, { useState } from 'react';
-import LoginScreen from './screens/Login';
+import Login from './screens/Login';
+import { Route, Routes } from 'react-router-dom';
+import ProtectedRoute from './screens/components/ProtectedRoute';
+import Home from './screens/Home';
+import PageNotFound from './screens/components/PageNotFound';
 
-type User = {
-  email: string,
+export type User = {
+  email: string | null;
+  uid?: string | null;
 }
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
 
-  const handleLogin = (email: string, password: string) => {
+  const handleLogin = (email: string) => {
     setUser({email})
   };
 
+  console.log(user, 'user');
+
   return (
     <div className="App">
-      {user ? (
-        <div>Welcome, {user.email}!</div>
-      ) : (
-        <LoginScreen onLogin={handleLogin} />
-      )}
+      <Routes>
+        <Route index element={<Login onLogin={handleLogin} />} />
+        <Route path="/login" element={<Login onLogin={handleLogin} />} />
+        <Route path="/home/*" element={<ProtectedRoute><Home user={user} /></ProtectedRoute>} />
+        <Route path="*" element={<PageNotFound />} />
+      </Routes>
     </div>
   );
 }
