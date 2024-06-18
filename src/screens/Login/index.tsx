@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 
-interface LoginScreenProps {
+type LoginScreenProps = {
   onLogin: (email: string, password: string) => void;
 }
 
-const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
+const LoginScreen = (props: LoginScreenProps) => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    onLogin(email, password);
+    props.onLogin(email, password);
   };
 
   return (
@@ -50,13 +50,14 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
             <button
               type="submit"
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-8 rounded-full focus:outline-none focus:shadow-outline"
+              onClick={handleLogin}
             >
               Login
             </button>
           </div>
           <div className="text-center">
             <a href="#" className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800">
-              Forgot Password?
+              Don't have an account? Register!
             </a>
           </div>
         </form>
