@@ -4,27 +4,22 @@ import { Route, Routes } from 'react-router-dom';
 import ProtectedRoute from './screens/components/ProtectedRoute';
 import Home from './screens/Home';
 import PageNotFound from './screens/components/PageNotFound';
+import { useAppDispatch } from './store';
+import { addOwnEmail } from './store/loginSlice';
 
-export type User = {
-  email: string | null;
-  uid?: string | null;
-}
-
-function App() {
-  const [user, setUser] = useState<User | null>(null);
+const App = () => {
+  const dispatch = useAppDispatch();
 
   const handleLogin = (email: string) => {
-    setUser({email})
+    dispatch(addOwnEmail(email));
   };
-
-  console.log(user, 'user');
 
   return (
     <div className="App">
       <Routes>
         <Route index element={<Login onLogin={handleLogin} />} />
         <Route path="/login" element={<Login onLogin={handleLogin} />} />
-        <Route path="/home/*" element={<ProtectedRoute><Home user={user} /></ProtectedRoute>} />
+        <Route path="/home/*" element={<ProtectedRoute><Home /></ProtectedRoute>} />
         <Route path="*" element={<PageNotFound />} />
       </Routes>
     </div>

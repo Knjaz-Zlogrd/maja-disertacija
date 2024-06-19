@@ -3,6 +3,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 type State = {
   authToken: string | null;
   uid: string | null;
+  ownEmail: string | null;
   loading: boolean;
   error: string | null;
 };
@@ -10,6 +11,7 @@ type State = {
 const initialState: State = {
   authToken: null,
   uid: null,
+  ownEmail: null,
   loading: false,
   error: null,
 };
@@ -24,6 +26,9 @@ export const loginSlice = createSlice({
     addUID: (state, action: PayloadAction<string | null>) => {
       state.uid = action.payload;
     },
+    addOwnEmail: (state, action: PayloadAction<string | null>) => {
+      state.ownEmail = action.payload;
+    },
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.loading = action.payload;
     },
@@ -33,12 +38,13 @@ export const loginSlice = createSlice({
     logout: (state) => {
       state.authToken = null;
       state.uid = null;
+      state.ownEmail = null;
       state.error = null;
       state.loading = false;
     },
   },
 });
 
-export const { addAuthToken, addUID, setLoading, setError, logout } = loginSlice.actions;
+export const { addAuthToken, addUID, addOwnEmail, setLoading, setError, logout } = loginSlice.actions;
 
 export default loginSlice.reducer;

@@ -1,15 +1,12 @@
 import React from 'react';
-import { User } from '../../App';
-import { useAppDispatch } from '../../store';
+import { useAppDispatch, useAppSelector } from '../../store';
 import { signOut } from 'firebase/auth';
 import { logout } from '../../store/loginSlice';
 import { auth } from '../../firebaseConfig';
 
-type HomeProps = {
-  user: User | null;
-}
 
-const Home = (props: HomeProps) => {
+const Home = () => {
+  const ownEmail = useAppSelector((state) => state.loginSlice.ownEmail);
   const dispatch = useAppDispatch();
 
   const handleLogout = async () => {
@@ -23,7 +20,7 @@ const Home = (props: HomeProps) => {
 
   return (
     <div>
-      <div>Welcome, {props.user?.email}!</div>
+      <div>Welcome, {ownEmail}!</div>
       <button onClick={handleLogout}>Log out</button>
     </div>
   );
