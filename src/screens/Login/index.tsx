@@ -19,18 +19,6 @@ const Login = ({onLogin}: LoginScreenProps) => {
   const error = useAppSelector((state) => state.loginSlice.error);
   const loading = useAppSelector((state) => state.loginSlice.loading);
 
-
-  // const handleLogin = async (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   try {
-  //     const user = await loginWithEmailAndPassword(email, password);
-  //     console.log('User logged in:', user);
-  //     onLogin(email);
-  //   } catch (error) {
-  //     console.error('Error logging in:', error);
-  //   }
-  // };
-
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     dispatch(setLoading(true));
@@ -50,18 +38,6 @@ const Login = ({onLogin}: LoginScreenProps) => {
       dispatch(setLoading(false));
     }
   };
-
-  // const handleRegister = async (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   try {
-  //     const user = await registerWithEmailAndPassword(email, password);
-  //     console.log('User registered:', user);
-  //     onLogin(email);
-
-  //   } catch (error) {
-  //     console.error('Error registering:', error);
-  //   }
-  // };
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
