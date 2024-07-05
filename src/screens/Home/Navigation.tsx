@@ -31,6 +31,9 @@ const Navigation = () => {
           <li className={currentRoute === 'my-meetings' ? 'text-white' : 'text-gray-400'}>
             <Link to="/home/my-meetings">My Meetings</Link>
           </li>
+          <li className={currentRoute === 'profile' ? 'text-white' : 'text-gray-400'}>
+            <Link to="/home/profile">Profile</Link>
+          </li>
           <li className={currentRoute === 'about' ? 'text-white' : 'text-gray-400'}>
             <Link to="/home/about">About</Link>
           </li>

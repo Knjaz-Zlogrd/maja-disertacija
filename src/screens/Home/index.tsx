@@ -8,6 +8,7 @@ import Navigation from './Navigation';
 import About from '../About';
 import CreateMeeting from '../Create';
 import MyMeetings from '../Meetings';
+import Profile from '../../Profile';
 
 const Home = () => {
   const ownEmail = useAppSelector((state) => state.loginSlice.ownEmail);
@@ -18,6 +19,7 @@ const Home = () => {
       <Routes>
         <Route path="create-meeting" element={<CreateMeeting />} />
         <Route path="my-meetings" element={<MyMeetings />} />
+        <Route path="profile" element={<Profile />} />
         <Route path="about" element={<About />} />
         <Route path="/" element={
           <div className="p-4">
