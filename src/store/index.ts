@@ -7,6 +7,7 @@ import {
   } from "@reduxjs/toolkit";
   import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
   import { loginSlice } from "./loginSlice";
+  import { usersSlice } from "./usersSlice";
   import localStorage from "redux-persist/lib/storage";
   import {
     FLUSH,

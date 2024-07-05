@@ -1,6 +1,15 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
+export const Roles = {
+  ADMIN: 'admin',
+  USER: 'user',
+} as const;
+
+export type Role = (typeof Roles)[keyof typeof Roles];
+
 export type User = {
+  email: string;
+  userRole: Role;
   firstName: string;
   lastName: string;
   company: string;

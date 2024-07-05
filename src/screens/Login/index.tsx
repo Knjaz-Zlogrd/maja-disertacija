@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { loginWithEmailAndPassword, registerWithEmailAndPassword } from '../../auth';
+import { loginWithEmailAndPassword, registerWithEmailAndPassword, fetchUserRole } from '../../auth';
 import { addAuthToken, addUID, setError, setLoading } from '../../store/loginSlice';
 import { useAppDispatch, useAppSelector } from '../../store';
 import { useNavigate } from 'react-router-dom';
-
+import { Roles, Role } from '../../store/usersSlice'
 type LoginScreenProps = {
-  onLogin: (email: string) => void;
+  onLogin: (email: string, role: Role) => void;
 }
 
 const Login = ({onLogin}: LoginScreenProps) => {
@@ -15,6 +15,7 @@ const Login = ({onLogin}: LoginScreenProps) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isRegistering, setIsRegistering] = useState(false);
+  const [role, setRole] = useState<Role>(Roles.USER);
 
   const error = useAppSelector((state) => state.loginSlice.error);
   const loading = useAppSelector((state) => state.loginSlice.loading);
@@ -27,11 +28,16 @@ const Login = ({onLogin}: LoginScreenProps) => {
       const token = await user.getIdToken();
       const uid = user.uid;
 
-      dispatch(addUID(uid));
-      dispatch(addAuthToken(token));
-      dispatch(setLoading(false));
-      onLogin(email);
-      navigate('/home');
+      const userRole = await fetchUserRole(uid);
+      if (userRole) {
+        dispatch(addUID(uid));
+        dispatch(addAuthToken(token));
+        dispatch(setLoading(false));
+        onLogin(email, userRole);
+        navigate('/home');
+      } else {
+        throw new Error("User role not found");
+      }
     } catch (error) {
       console.log('Unable to login.', error);
       dispatch(setError('Login failed. Please try again.'));
@@ -43,14 +49,14 @@ const Login = ({onLogin}: LoginScreenProps) => {
     e.preventDefault();
     dispatch(setLoading(true));
     try {
-      const user = await registerWithEmailAndPassword(email, password);
+      const user = await registerWithEmailAndPassword(email, password, role);
       const token = await user.getIdToken();
       const uid = user.uid;
 
       dispatch(addUID(uid));
       dispatch(addAuthToken(token));
       dispatch(setLoading(false));
-      onLogin(email);
+      onLogin(email, role);
       navigate('/home');
     } catch (error) {
       console.error('Error registering:', error);
@@ -102,6 +108,23 @@ const Login = ({onLogin}: LoginScreenProps) => {
               required
             />
           </div>
+          {isRegistering && (
+            <div className="mb-6">
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="role">
+                Role
+              </label>
+              <select
+                id="role"
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                value={role}
+                onChange={(e) => setRole(e.target.value as Role)}
+                required
+              >
+                <option value={Roles.USER}>User</option>
+                <option value={Roles.ADMIN}>Admin</option>
+              </select>
+            </div>
+          )}
           {loading && <div className="text-center text-blue-500 mb-4">Loading...</div>}
           {error && !loading && <div className="text-center text-red-500 mb-4">{error}</div>}
           <div className="flex items-center justify-center mb-6">
