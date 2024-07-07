@@ -15,7 +15,7 @@ const App = () => {
   };
 
   return (
-    <div className="App">
+    <div className="App flex flex-col h-screen">
       <Routes>
         <Route index element={<Login onLogin={handleLogin} />} />
         <Route path="/login" element={<Login onLogin={handleLogin} />} />

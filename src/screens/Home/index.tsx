@@ -22,7 +22,7 @@ const Home = () => {
         <Route path="profile" element={<Profile />} />
         <Route path="about" element={<About />} />
         <Route path="/" element={
-          <div className="p-4">
+          <div className="p-4 mt-16">
             <h1 className="text-2xl">Home</h1>
             <p>Welcome to the Home page, {ownEmail}!</p>
           </div>

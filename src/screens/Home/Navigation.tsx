@@ -22,7 +22,7 @@ const Navigation = () => {
   };
 
   return (
-    <nav className="bg-gray-800 p-4">
+    <nav className="bg-gray-800 p-4 fixed top-0 left-0 w-full">
       <ul className="flex justify-between items-center space-x-4">
         <div className="flex space-x-4">
           <li className={currentRoute === 'create-meeting' ? 'text-white' : 'text-gray-400'}>
