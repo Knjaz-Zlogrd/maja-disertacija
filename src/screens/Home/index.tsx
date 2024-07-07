@@ -8,7 +8,7 @@ import Navigation from './Navigation';
 import About from '../About';
 import CreateMeeting from '../Create';
 import MyMeetings from '../Meetings';
-import Profile from '../../Profile';
+import Profile from '../Profile';
 
 const Home = () => {
   const ownEmail = useAppSelector((state) => state.loginSlice.ownEmail);
