@@ -18,10 +18,12 @@ export type User = {
 
 export type State = {
   allUsers: Record<string, User>;
+  ownUser: User | null;
 };
 
 const initialState: State = {
   allUsers: {},
+  ownUser: null,
 };
 
 export const usersSlice = createSlice({
@@ -31,7 +33,14 @@ export const usersSlice = createSlice({
     addAllUsers: (state, action: PayloadAction<Record<string, User>>) => {
       state.allUsers = action.payload;
     },
+    updateOwnUserProfile: (state, action: PayloadAction<Partial<User>>) => {
+      if (state.ownUser) {
+        state.ownUser = { ...state.ownUser, ...action.payload };
+      } else {
+        state.ownUser = action.payload as User; // Initialize if ownUser is null
+      }
+    },
   },
 });
 
-export const { addAllUsers } = usersSlice.actions;
+export const { addAllUsers, updateOwnUserProfile } = usersSlice.actions;

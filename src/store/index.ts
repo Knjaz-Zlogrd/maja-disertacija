@@ -28,7 +28,7 @@ import {
   
   const rootReducer = combineReducers({
     [loginSlice.name]: persistReducer(authPersistConfig, loginSlice.reducer),
-    [usersSlice.name]: loginSlice.reducer,
+    [usersSlice.name]: usersSlice.reducer,
     // [slice.name]: slice.reducer,
     // [slice.name]: slice.reducer,
   });

@@ -1,21 +1,34 @@
-import React, { useState } from 'react';
-import { useAppSelector } from '../../store';
-import { updateDoc, doc } from 'firebase/firestore';
+import React, { useEffect, useState } from 'react';
+import { useAppSelector, useAppDispatch } from '../../store';
+import { updateDoc, doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../../firebaseConfig';
-import useUserProfile from '../../hooks/useUserProfile';
-import { User } from '../../store/usersSlice';
+import { User, updateOwnUserProfile } from '../../store/usersSlice';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const Profile = () => {
+  const dispatch = useAppDispatch();
   const uid = useAppSelector((state) => state.loginSlice.uid);
-  const { user, loading, error } = useUserProfile(uid);
+  const ownUser = useAppSelector((state) => state.usersSlice.ownUser);
 
   const [isEditing, setIsEditing] = useState(false);
   const [editUser, setEditUser] = useState<User | null>(null);
 
+  useEffect(() => {
+    if (uid) {
+      const unsubscribe = onSnapshot(doc(db, 'users', uid), (doc) => {
+        if (doc.exists()) {
+          dispatch(updateOwnUserProfile(doc.data() as User));
+        }
+      }, (error) => {
+        console.error('Error fetching user document:', error);
+      });
+      return () => unsubscribe();
+    }
+  }, [uid, dispatch]);
+
   const handleEditClick = () => {
-    setEditUser(user);
+    setEditUser(ownUser);
     setIsEditing(true);
   };
 
@@ -45,15 +58,7 @@ const Profile = () => {
     });
   };
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
-
-  if (!user) {
+  if (!ownUser) {
     return <div>No user data found</div>;
   }
 
@@ -155,11 +160,11 @@ const Profile = () => {
           <>
             <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">Profile</h2>
             <div className="mb-4">
-              <p className="text-gray-700"><strong>Email:</strong> {user.email}</p>
-              <p className="text-gray-700"><strong>First Name:</strong> {user.firstName || <span className="text-gray-400">Tell us your first name</span>}</p>
-              <p className="text-gray-700"><strong>Last Name:</strong> {user.lastName || <span className="text-gray-400">Tell us your last name</span>}</p>
-              <p className="text-gray-700"><strong>Company:</strong> {user.company || <span className="text-gray-400">Tell us the name of your company</span>}</p>
-              <p className="text-gray-700"><strong>Team:</strong> {user.team || <span className="text-gray-400">Tell us the name of your team</span>}</p>
+              <p className="text-gray-700"><strong>Email:</strong> {ownUser.email}</p>
+              <p className="text-gray-700"><strong>First Name:</strong> {ownUser.firstName || <span className="text-gray-400">Tell us your first name</span>}</p>
+              <p className="text-gray-700"><strong>Last Name:</strong> {ownUser.lastName || <span className="text-gray-400">Tell us your last name</span>}</p>
+              <p className="text-gray-700"><strong>Company:</strong> {ownUser.company || <span className="text-gray-400">Tell us the name of your company</span>}</p>
+              <p className="text-gray-700"><strong>Team:</strong> {ownUser.team || <span className="text-gray-400">Tell us the name of your team</span>}</p>
             </div>
             <div className="flex items-center justify-center mb-6">
               <button
