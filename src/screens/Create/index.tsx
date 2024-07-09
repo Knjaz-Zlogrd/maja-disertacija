@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, ChangeEvent } from 'react';
 
-const CreateMeeting: React.FC = () => {
+const CreateMeeting = () => {
   const [title, setTitle] = useState<string>('');
   const [selectedOption, setSelectedOption] = useState<string>('');
   const [dropdownVisible, setDropdownVisible] = useState<boolean>(false);
