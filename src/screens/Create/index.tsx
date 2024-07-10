@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect, ChangeEvent } from 'react';
 import QuestionCards from './QuestionCards';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
 
 const CreateMeeting = () => {
   const [title, setTitle] = useState<string>('');
@@ -46,10 +48,10 @@ const CreateMeeting = () => {
           placeholder="Enter meeting title"
         />
         <button
-          className="ml-2 px-4 py-2 bg-blue-500 text-white rounded"
+          className="ml-2 px-4 py-2 bg-blue-500 text-white rounded justify-between"
           onClick={toggleDropdown}
         >
-          Select meeting type
+          <FontAwesomeIcon size="lg" icon={faChevronDown} />
         </button>
         {dropdownVisible && (
           <div ref={dropdownRef} className="absolute z-10 w-full mt-2 bg-white border rounded shadow top-full">
