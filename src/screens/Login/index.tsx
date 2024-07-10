@@ -4,6 +4,7 @@ import { addAuthToken, addUID, setError, setLoading } from '../../store/loginSli
 import { useAppDispatch, useAppSelector } from '../../store';
 import { useNavigate } from 'react-router-dom';
 import { Roles, Role } from '../../store/usersSlice'
+
 type LoginScreenProps = {
   onLogin: (email: string, role: Role) => void;
 }
