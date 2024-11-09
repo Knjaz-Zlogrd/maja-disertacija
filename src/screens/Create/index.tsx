@@ -1,77 +1,145 @@
-import React, { useState, useRef, useEffect, ChangeEvent } from 'react';
-import QuestionCards from './QuestionCards';
+import React, { useState } from 'react';
+import { useForm, useFieldArray, SubmitHandler } from 'react-hook-form';
+import { v4 as uuidv4 } from 'uuid';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faChevronDown } from '@fortawesome/free-solid-svg-icons';
+
+type Question = {
+  id: string;
+  question: string;
+  type: string;
+};
+
+type FormData = {
+  title: string;
+  questions: Question[];
+};
 
 const CreateMeeting = () => {
-  const [title, setTitle] = useState<string>('');
-  const [selectedOption, setSelectedOption] = useState<string>('');
-  const [dropdownVisible, setDropdownVisible] = useState<boolean>(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
 
-  const handleTitleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setTitle(e.target.value);
+  // Default question data for predefined options
+  const predefinedOptions: Record<string, string[]> = {
+    'Daily Standup': [
+      'What did you do since last standup?',
+      'What do you plan on achieving today?',
+      'Do you have any blockers?',
+      'Do you need anyone\'s help?',
+    ],
+    'Sprint Retrospective': [
+      'What did you particularly like this sprint?',
+      'What didn\'t you like this sprint?',
+      'What could have been done better?',
+    ],
   };
 
-  const handleOptionSelect = (option: string) => {
-    setTitle(option);
-    setSelectedOption(option);
-    setDropdownVisible(false);
+  // Initialize form with react-hook-form
+  const { control, handleSubmit, register, reset, setValue } = useForm<FormData>({
+    defaultValues: {
+      title: '',
+      questions: [{ id: uuidv4(), question: '', type: 'text' }],
+    },
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: 'questions',
+  });
+
+  const onSubmit: SubmitHandler<FormData> = (data) => {
+    console.log(data);
   };
 
-  const toggleDropdown = () => {
-    setDropdownVisible(!dropdownVisible);
-  };
+  const handleOptionChange = (option: string) => {
+    // Set the title based on the selected option
+    setValue('title', option);
 
-  const handleClickOutside = (event: MouseEvent) => {
-    if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-      setDropdownVisible(false);
-    }
-  };
+    // Reset the questions based on the selected option
+    const questions = predefinedOptions[option] || [];
 
-  useEffect(() => {
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
+    // Reset the form and append new questions
+    reset({
+      title: option,
+      questions: questions.map((question) => ({
+        id: uuidv4(),
+        question,
+        type: 'text',
+      })),
+    });
+
+    setDropdownOpen(false);
+  };
 
   return (
-    <div className="p-4 mt-16">
-      <h1 className="text-2xl">Create a Meeting</h1>
-      <div className="mt-4 relative flex items-center">
+    <form onSubmit={handleSubmit(onSubmit)} className="p-4 mt-16 max-w-2xl mx-auto relative">
+      <h1 className="text-2xl mb-4">Create a Survey</h1>
+
+      <div className="mb-4 relative">
         <input
-          type="text"
-          className="flex-1 p-2 border rounded"
-          value={title}
-          onChange={handleTitleChange}
-          placeholder="Enter meeting title"
+          {...register('title')}
+          className="w-full p-2 border rounded"
+          placeholder="Enter survey title"
         />
         <button
-          className="ml-2 px-4 py-2 bg-blue-500 text-white rounded justify-between"
-          onClick={toggleDropdown}
+          type="button"
+          className="absolute top-1/2 right-2 transform -translate-y-1/2"
+          onClick={() => setDropdownOpen(!dropdownOpen)} // Toggle dropdown
         >
-          <FontAwesomeIcon size="lg" icon={faChevronDown} />
+          <FontAwesomeIcon icon={faChevronDown} />
         </button>
-        {dropdownVisible && (
-          <div ref={dropdownRef} className="absolute z-10 w-full mt-2 bg-white border rounded shadow top-full">
+
+        {dropdownOpen && (
+          <div className="absolute w-full bg-white border rounded shadow-lg mt-1 z-10">
             <div
-              className="px-4 py-2 cursor-pointer hover:bg-gray-100"
-              onClick={() => handleOptionSelect('Daily Standup')}
+              onClick={() => handleOptionChange('Daily Standup')}
+              className="p-2 hover:bg-gray-100 cursor-pointer"
             >
               Daily Standup
             </div>
             <div
-              className="px-4 py-2 cursor-pointer hover:bg-gray-100"
-              onClick={() => handleOptionSelect('Sprint Retrospective')}
+              onClick={() => handleOptionChange('Sprint Retrospective')}
+              className="p-2 hover:bg-gray-100 cursor-pointer"
             >
               Sprint Retrospective
             </div>
           </div>
         )}
       </div>
-      <QuestionCards selectedOption={selectedOption}/>
-    </div>
+
+      {fields.map((field, index) => (
+        <div key={field.id} className="mb-4">
+          <input
+            {...register(`questions.${index}.question`)}
+            className="w-full md:w-1/2 p-2 border rounded"
+            placeholder={`Question ${index + 1}`}
+            defaultValue={field.question} // Pre-fill the question if it exists
+          />
+          <button
+            type="button"
+            onClick={() => remove(index)}
+            className="ml-2 text-red-500 hover:text-red-700"
+          >
+            Remove
+          </button>
+        </div>
+      ))}
+
+      <div className="mt-4 flex items-center space-x-4">
+        <button
+          type="button"
+          onClick={() => append({ id: uuidv4(), question: '', type: 'text' })}
+          className="flex items-center justify-center w-10 h-10 text-white bg-blue-500 rounded-full hover:bg-blue-600 focus:outline-none"
+        >
+          <FontAwesomeIcon icon={faPlus} />
+        </button>
+        <button
+          type="submit"
+          className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+        >
+          Submit
+        </button>
+      </div>
+    </form>
   );
 };
 
