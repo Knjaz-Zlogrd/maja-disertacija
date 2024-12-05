@@ -80,18 +80,41 @@ const CreateMeeting = () => {
           className={`w-full p-2 border rounded ${errors.title ? 'border-red-500' : ''}`}
           placeholder="Enter survey title"
         />
-        {errors.title && (
-          <span className="text-red-500 text-sm absolute -bottom-5 left-0">{errors.title.message}</span>
-        )}
+        <span
+          className={`text-red-500 text-sm mt-1 absolute -bottom-6 left-0 transition-opacity duration-200 ${
+            errors.title ? 'opacity-100' : 'opacity-0'
+          }`}
+          style={{ minHeight: '1.25rem' }}
+        >
+          {errors.title && errors.title.message}
+        </span>
 
         <button
           type="button"
           className="absolute top-1/2 right-2 transform -translate-y-1/2"
-          onClick={() => setDropdownOpen(!dropdownOpen)}
+          onClick={() => setDropdownOpen((prev) => !prev)}
         >
           <FontAwesomeIcon icon={faChevronDown} />
         </button>
       </div>
+
+      {/* Dropdown Options */}
+      {dropdownOpen && (
+        <div className="absolute w-full bg-white border rounded shadow-lg z-10" style={{ top: '30%' }}>
+          <div
+            onClick={() => handleOptionChange('Daily Standup')}
+            className="p-2 hover:bg-gray-100 cursor-pointer"
+          >
+            Daily Standup
+          </div>
+          <div
+            onClick={() => handleOptionChange('Sprint Retrospective')}
+            className="p-2 hover:bg-gray-100 cursor-pointer"
+          >
+            Sprint Retrospective
+          </div>
+        </div>
+      )}
 
       {fields.map((field, index) => (
         <div key={field.id} className="mb-2 flex items-center space-x-2">

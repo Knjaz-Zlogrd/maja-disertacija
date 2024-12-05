@@ -8,6 +8,7 @@ import {
   import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
   import { loginSlice } from "./loginSlice";
   import { usersSlice } from "./usersSlice";
+  import { meetingSlice } from "./meetingSlice";
   import localStorage from "redux-persist/lib/storage";
   import {
     FLUSH,
@@ -29,7 +30,7 @@ import {
   const rootReducer = combineReducers({
     [loginSlice.name]: persistReducer(authPersistConfig, loginSlice.reducer),
     [usersSlice.name]: usersSlice.reducer,
-    // [slice.name]: slice.reducer,
+    [meetingSlice.name]: meetingSlice.reducer,
     // [slice.name]: slice.reducer,
   });
   
