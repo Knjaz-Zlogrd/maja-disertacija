@@ -34,7 +34,7 @@ const CreateMeeting = () => {
   };
 
   // Initialize form with react-hook-form
-  const { control, handleSubmit, register, reset, setValue } = useForm<FormData>({
+  const { control, handleSubmit, register, reset, setValue, formState: {errors} } = useForm<FormData>({
     defaultValues: {
       title: '',
       questions: [{ id: uuidv4(), question: '', type: 'text' }],
@@ -74,50 +74,48 @@ const CreateMeeting = () => {
     <form onSubmit={handleSubmit(onSubmit)} className="p-4 mt-16 max-w-2xl mx-auto relative">
       <h1 className="text-2xl mb-4">Create a Survey</h1>
 
-      <div className="mb-4 relative">
+      <div className="mb-8 relative">
         <input
-          {...register('title')}
-          className="w-full p-2 border rounded"
+          {...register('title', { required: 'Survey title is required.' })}
+          className={`w-full p-2 border rounded ${errors.title ? 'border-red-500' : ''}`}
           placeholder="Enter survey title"
         />
+        {errors.title && (
+          <span className="text-red-500 text-sm absolute -bottom-5 left-0">{errors.title.message}</span>
+        )}
+
         <button
           type="button"
           className="absolute top-1/2 right-2 transform -translate-y-1/2"
-          onClick={() => setDropdownOpen(!dropdownOpen)} // Toggle dropdown
+          onClick={() => setDropdownOpen(!dropdownOpen)}
         >
           <FontAwesomeIcon icon={faChevronDown} />
         </button>
-
-        {dropdownOpen && (
-          <div className="absolute w-full bg-white border rounded shadow-lg mt-1 z-10">
-            <div
-              onClick={() => handleOptionChange('Daily Standup')}
-              className="p-2 hover:bg-gray-100 cursor-pointer"
-            >
-              Daily Standup
-            </div>
-            <div
-              onClick={() => handleOptionChange('Sprint Retrospective')}
-              className="p-2 hover:bg-gray-100 cursor-pointer"
-            >
-              Sprint Retrospective
-            </div>
-          </div>
-        )}
       </div>
 
       {fields.map((field, index) => (
-        <div key={field.id} className="mb-4">
-          <input
-            {...register(`questions.${index}.question`)}
-            className="w-full md:w-1/2 p-2 border rounded"
-            placeholder={`Question ${index + 1}`}
-            defaultValue={field.question} // Pre-fill the question if it exists
-          />
+        <div key={field.id} className="mb-2 flex items-center space-x-2">
+          {/* Input and Error Message */}
+          <div className="flex flex-col w-3/6">
+            <input
+              {...register(`questions.${index}.question`, { required: 'Question is required.' })}
+              className={`w-full p-2 border rounded ${errors.questions?.[index]?.question ? 'border-red-500' : ''}`}
+              placeholder={`Question ${index + 1}`}
+              defaultValue={field.question}
+            />
+            <span
+              className={`text-red-500 text-sm mt-1 transition-opacity duration-200 ${errors.questions?.[index]?.question ? 'opacity-100' : 'opacity-0'}`}
+              style={{ minHeight: '1.25rem' }} // Reserve space for error
+            >
+              {errors.questions?.[index]?.question && errors.questions[index]?.question?.message}
+            </span>
+          </div>
+
+          {/* Remove Button */}
           <button
             type="button"
             onClick={() => remove(index)}
-            className="ml-2 text-red-500 hover:text-red-700"
+            className="text-red-500 hover:text-red-700 mb-6"
           >
             Remove
           </button>
