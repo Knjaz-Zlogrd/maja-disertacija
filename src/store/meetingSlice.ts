@@ -1,30 +1,30 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-type Question = {
+export type Question = {
   id: string;
   question: string;
   type: string;
 };
 
-type Meeting = {
+export type Meeting = {
   title: string;
   questions: Question[];
 };
 
-type MeetingState = {
-  meetings: Meeting[];
+export type State = {
+  meeting: Meeting | undefined;
 }
 
-const initialState: MeetingState = {
-  meetings: [],
+const initialState: State = {
+  meeting: undefined,
 };
 
 export const meetingSlice = createSlice({
   name: 'meetingSlice',
   initialState,
   reducers: {
-    addMeeting: (state, action: PayloadAction<Meeting>) => {
-      state.meetings.push(action.payload);
+    addMeeting: (state, action: PayloadAction<Meeting | undefined>) => {
+      state.meeting = action.payload;
     },
   },
 });
