@@ -6,6 +6,7 @@ import { auth } from '../../firebaseConfig';
 import { useAppDispatch } from '../../store';
 import { logout } from '../../store/loginSlice';
 import { addMeeting } from '../../store/meetingSlice';
+import { addAllUsers } from '../../store/usersSlice';
 
 const Navigation = () => {
   const location = useLocation();
@@ -18,6 +19,7 @@ const Navigation = () => {
       await signOut(auth);
       dispatch(logout());
       dispatch(addMeeting(undefined));
+      dispatch(addAllUsers({}));
     } catch (error) {
       console.error('Failed to logout', error);
     }

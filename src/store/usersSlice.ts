@@ -43,4 +43,20 @@ export const usersSlice = createSlice({
   },
 });
 
+export const filteredUsers = (
+  allUsers: Record<string, User> | undefined,
+  searchString: string,
+  ownUser: User | null
+) => {
+  if (!ownUser || !allUsers) return [];
+  return Object.values(allUsers).filter(
+    (user) =>
+      user.company === ownUser.company &&
+      user.team === ownUser.team &&
+      user.email !== ownUser.email &&
+      (user.firstName + ' ' + user.lastName).toLowerCase().includes(searchString.toLowerCase())
+  );
+};
+
+
 export const { addAllUsers, updateOwnUserProfile } = usersSlice.actions;
