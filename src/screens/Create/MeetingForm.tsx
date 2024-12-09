@@ -6,10 +6,6 @@ import { faPlus, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { addMeeting, Meeting } from '../../store/meetingSlice';
 import { useAppDispatch } from '../../store';
 
-// type MeetingFormProps = {
-//   onSubmit: (data: Meeting) => void;
-// }
-
 const MeetingForm = () => {
   const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
   const dispatch = useAppDispatch();
