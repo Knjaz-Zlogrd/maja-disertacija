@@ -10,11 +10,12 @@ import CreateMeeting from '../Create';
 import MyMeetings from '../Meetings';
 import Profile from '../Profile';
 import { collection, getDocs } from 'firebase/firestore';
-import { addAllUsers } from '../../store/usersSlice';
+import { addAllUsers, updateOwnUserProfile, User } from '../../store/usersSlice';
 
 const Home = () => {
   const dispatch = useAppDispatch();
   const ownEmail = useAppSelector((state) => state.loginSlice.ownEmail);
+  const allUsers = useAppSelector((state) => state.usersSlice.allUsers);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -28,6 +29,13 @@ const Home = () => {
         });
 
         dispatch(addAllUsers(usersData));
+        if (ownEmail) {
+          const allUsers = Object.values(usersData) as User[];
+          const ownUser = allUsers.find((user) => user.email === ownEmail);
+          if (ownUser) {
+            dispatch(updateOwnUserProfile(ownUser))
+          }
+        }
       } catch (error) {
         console.error('Error fetching users:', error);
       }
