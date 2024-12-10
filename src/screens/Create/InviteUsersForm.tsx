@@ -5,6 +5,7 @@ import { filteredUsers } from '../../store/usersSlice';
 
 const InviteUsersForm = () => {
   const [searchTerm, setSearchTerm] = useState<string>('');
+  const [selectedUsers, setSelectedUsers] = useState<Set<string>>(new Set());
   const dispatch = useAppDispatch();
 
   const allUsers = useAppSelector((state) => state.usersSlice.allUsers);
@@ -16,6 +17,18 @@ const InviteUsersForm = () => {
 
   const handleGoBack = () => {
     dispatch(addMeeting(undefined));
+  };
+
+  const handleUserClick = (userId: string) => {
+    setSelectedUsers((prev) => {
+      const newSelected = new Set(prev);
+      if (newSelected.has(userId)) {
+        newSelected.delete(userId);
+      } else {
+        newSelected.add(userId);
+      }
+      return newSelected;
+    });
   };
 
   return (
@@ -49,17 +62,40 @@ const InviteUsersForm = () => {
       )}
 
       <div className="mb-4">
-        <input
-          type="text"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Search users by name"
-          className="w-full p-2 border rounded mb-4"
-        />
-        <ul className="list-disc ml-6">
+        <h2 className="text-lg font-semibold mb-2">Users to Invite</h2>
+        <div className="flex items-center mb-4">
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search users by name"
+            className="w-full p-2 border rounded mr-2"
+          />
+          <button
+            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+            onClick={() => alert('Next clicked!')}
+          >
+            Next
+          </button>
+        </div>
+        <ul>
           {usersToShow.map((user, index) => (
-            <li key={index} className="mb-2">
-              {user.firstName} {user.lastName}
+            <li
+              key={index}
+              onClick={() => handleUserClick(user.email)}
+              style={{userSelect: 'none'}}
+              className={`mb-2 p-2 border rounded cursor-pointer ${
+                selectedUsers.has(user.email) ? 'bg-green-100' : ''
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <span>
+                  {user.firstName} {user.lastName}
+                </span>
+                {selectedUsers.has(user.email) && (
+                  <span className="font-bold">✔</span>
+                )}
+              </div>
             </li>
           ))}
         </ul>
