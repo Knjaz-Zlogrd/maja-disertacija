@@ -11,10 +11,11 @@ const CreateMeeting = () => {
   console.log(selectedUserIds, 'selkasdasd')
 
   return (
-    meeting ? selectedUserIds.length !== 0 ? 
-      <ScheduleForm meeting={meeting} selectedUserIds={selectedUserIds} /> : 
-        <InviteUsersForm /> : 
-          <MeetingForm />
+    meeting ? 
+      selectedUserIds.length !== 0 ? 
+        <ScheduleForm meeting={meeting} selectedUserIds={selectedUserIds} /> : 
+      <InviteUsersForm /> : 
+    <MeetingForm />
   );
 }
 
