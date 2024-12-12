@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store';
-import { addMeeting } from '../../store/meetingSlice';
+import { addMeeting, addSelectedUsers } from '../../store/meetingSlice';
 import { filteredUsers } from '../../store/usersSlice';
 
 const InviteUsersForm = () => {
@@ -19,18 +19,27 @@ const InviteUsersForm = () => {
     dispatch(addMeeting(undefined));
   };
 
-  const handleUserClick = (userId: string) => {
+  const handleUserClick = (userEmail: string) => {
     setSelectedUsers((prev) => {
       const newSelected = new Set(prev);
-      if (newSelected.has(userId)) {
-        newSelected.delete(userId);
+      if (newSelected.has(userEmail)) {
+        newSelected.delete(userEmail);
       } else {
-        newSelected.add(userId);
+        newSelected.add(userEmail);
       }
       return newSelected;
     });
   };
 
+  const handleNext = () => {
+    const selectedUserIds = Object.keys(allUsers).filter((userId) =>
+      selectedUsers.has(allUsers[userId].email)
+    );
+  
+    dispatch(addSelectedUsers(selectedUserIds));
+  };
+  
+  console.log('bbb');
   return (
     <div className="p-4 mt-16 max-w-2xl mx-auto">
       <div className="flex items-center justify-between mb-4">
@@ -73,7 +82,7 @@ const InviteUsersForm = () => {
           />
           <button
             className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-            onClick={() => alert('Next clicked!')}
+            onClick={handleNext}
           >
             Next
           </button>

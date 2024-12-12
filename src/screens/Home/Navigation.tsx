@@ -5,7 +5,7 @@ import { signOut } from 'firebase/auth';
 import { auth } from '../../firebaseConfig';
 import { useAppDispatch } from '../../store';
 import { logout } from '../../store/loginSlice';
-import { addMeeting } from '../../store/meetingSlice';
+import { addMeeting, resetSelectedUsers } from '../../store/meetingSlice';
 import { addAllUsers } from '../../store/usersSlice';
 
 const Navigation = () => {
@@ -20,6 +20,7 @@ const Navigation = () => {
       dispatch(logout());
       dispatch(addMeeting(undefined));
       dispatch(addAllUsers({}));
+      dispatch(resetSelectedUsers());
     } catch (error) {
       console.error('Failed to logout', error);
     }
