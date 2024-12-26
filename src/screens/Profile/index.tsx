@@ -5,6 +5,7 @@ import { db } from '../../firebaseConfig';
 import { User, updateOwnUserProfile } from '../../store/usersSlice';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import axios from 'axios';
 
 const Profile = () => {
   const dispatch = useAppDispatch();
@@ -32,21 +33,54 @@ const Profile = () => {
     setIsEditing(true);
   };
 
+  // const handleUpdateProfile = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   if (uid && editUser) {
+  //     try {
+  //       await updateDoc(doc(db, 'users', uid), {
+  //         firstName: editUser.firstName,
+  //         lastName: editUser.lastName,
+  //         company: editUser.company,
+  //         team: editUser.team,
+  //       });
+  //       toast.success('Profile updated successfully');
+  //       setIsEditing(false);
+  //     } catch (err) {
+  //       console.error("Failed to update profile", err);
+  //       toast.error('Failed to update profile');
+  //     }
+  //   }
+  // };
+
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
+  
     if (uid && editUser) {
       try {
-        await updateDoc(doc(db, 'users', uid), {
+        // Prepare the `propToUpdate` object with the updated fields
+        const propToUpdate = {
           firstName: editUser.firstName,
           lastName: editUser.lastName,
           company: editUser.company,
           team: editUser.team,
+        };
+  
+        // Send the API request to update the user
+        const response = await axios.put("/user/update-user", {
+          email: ownUser?.email,
+          propToUpdate,
         });
-        toast.success('Profile updated successfully');
-        setIsEditing(false);
+  
+        // Handle the response
+        if (response.status === 200) {
+          toast.success("Profile updated successfully");
+          setIsEditing(false);
+        } else {
+          toast.error("Failed to update profile");
+        }
       } catch (err) {
         console.error("Failed to update profile", err);
-        toast.error('Failed to update profile');
+        toast.error("An error occurred while updating the profile");
       }
     }
   };

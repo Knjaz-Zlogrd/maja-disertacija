@@ -1,21 +1,21 @@
 import React, { useState } from 'react';
-import { loginWithEmailAndPassword, registerWithEmailAndPassword, fetchUserRole } from '../../auth';
-import { addAuthToken, addUID, setError, setLoading } from '../../store/loginSlice';
+import { loginWithEmailAndPassword, register } from '../../auth';
+import { addAuthToken, addOwnEmail, addUID, setError, setLoading } from '../../store/loginSlice';
 import { useAppDispatch, useAppSelector } from '../../store';
 import { useNavigate } from 'react-router-dom';
-import { Roles, Role } from '../../store/usersSlice'
+import { Roles, Role, updateOwnUserProfile } from '../../store/usersSlice'
 
-type LoginScreenProps = {
-  onLogin: (email: string, role: Role) => void;
-}
-
-const Login = ({onLogin}: LoginScreenProps) => {
+const Login = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
+  const [isRegistering, setIsRegistering] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isRegistering, setIsRegistering] = useState(false);
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [company, setCompany] = useState('');
+  const [team, setTeam] = useState('');
   const [role, setRole] = useState<Role>(Roles.USER);
 
   const error = useAppSelector((state) => state.loginSlice.error);
@@ -25,23 +25,22 @@ const Login = ({onLogin}: LoginScreenProps) => {
     e.preventDefault();
     dispatch(setLoading(true));
     try {
-      const user = await loginWithEmailAndPassword(email, password);
-      const token = await user.getIdToken();
-      const uid = user.uid;
+      const response = await loginWithEmailAndPassword(
+        email, 
+        password
+      );
+      
+      dispatch(addUID(response?.data.userId ?? null));
+      dispatch(addAuthToken(response?.data.accessToken ?? null));
+      dispatch(setLoading(false));
+      dispatch(addOwnEmail(email));
+      navigate('/home');
 
-      const userRole = await fetchUserRole(uid);
-      if (userRole) {
-        dispatch(addUID(uid));
-        dispatch(addAuthToken(token));
-        dispatch(setLoading(false));
-        onLogin(email, userRole);
-        navigate('/home');
-      } else {
-        throw new Error("User role not found");
-      }
     } catch (error) {
       console.log('Unable to login.', error);
       dispatch(setError('Login failed. Please try again.'));
+      dispatch(setLoading(false));
+    } finally {
       dispatch(setLoading(false));
     }
   };
@@ -50,15 +49,23 @@ const Login = ({onLogin}: LoginScreenProps) => {
     e.preventDefault();
     dispatch(setLoading(true));
     try {
-      const user = await registerWithEmailAndPassword(email, password, role);
-      const token = await user.getIdToken();
-      const uid = user.uid;
+      const response = await register(
+        email, 
+        password, 
+        firstName, 
+        lastName, 
+        team, 
+        company, 
+        role
+      );
 
-      dispatch(addUID(uid));
-      dispatch(addAuthToken(token));
+      dispatch(addUID(response?.data.userId ?? null));
+      dispatch(addAuthToken(response?.data.accessToken ?? null));
       dispatch(setLoading(false));
-      onLogin(email, role);
+      dispatch(addOwnEmail(email));
       navigate('/home');
+
+      dispatch(setLoading(false));
     } catch (error) {
       console.error('Error registering:', error);
       dispatch(setError('Registration failed. Please try again.'));
@@ -110,21 +117,79 @@ const Login = ({onLogin}: LoginScreenProps) => {
             />
           </div>
           {isRegistering && (
-            <div className="mb-6">
-              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="role">
-                Role
-              </label>
-              <select
-                id="role"
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                value={role}
-                onChange={(e) => setRole(e.target.value as Role)}
-                required
-              >
-                <option value={Roles.USER}>User</option>
-                <option value={Roles.ADMIN}>Admin</option>
-              </select>
-            </div>
+            <>
+              <div className="mb-4">
+                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="firstName">
+                  First Name
+                </label>
+                <input
+                  type="text"
+                  id="firstName"
+                  placeholder="Enter your first name"
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="lastName">
+                  Last Name
+                </label>
+                <input
+                  type="text"
+                  id="lastName"
+                  placeholder="Enter your last name"
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="team">
+                  Team
+                </label>
+                <input
+                  type="text"
+                  id="team"
+                  placeholder="Enter your team"
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  value={team}
+                  onChange={(e) => setTeam(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="company">
+                  Company
+                </label>
+                <input
+                  type="text"
+                  id="company"
+                  placeholder="Enter your company"
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  value={company}
+                  onChange={(e) => setCompany(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="mb-6">
+                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="role">
+                  Role
+                </label>
+                <select
+                  id="role"
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  value={role}
+                  onChange={(e) => setRole(e.target.value as Role)}
+                  required
+                >
+                  <option value={Roles.USER}>User</option>
+                  <option value={Roles.ADMIN}>Admin</option>
+                </select>
+              </div>
+            </>
           )}
           {loading && <div className="text-center text-blue-500 mb-4">Loading...</div>}
           {error && !loading && <div className="text-center text-red-500 mb-4">{error}</div>}
@@ -132,7 +197,7 @@ const Login = ({onLogin}: LoginScreenProps) => {
             <button
               type="submit"
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-8 rounded-full focus:outline-none focus:shadow-outline"
-              disabled={loading}
+              // disabled={loading}
             >
               {isRegistering ? 'Register' : 'Login'}
             </button>
