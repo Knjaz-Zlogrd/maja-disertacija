@@ -10,7 +10,7 @@ import CreateMeeting from '../Create';
 import MyMeetings from '../Meetings';
 import Profile from '../Profile';
 import { collection, getDocs } from 'firebase/firestore';
-import { addAllUsers, updateOwnUserProfile, User } from '../../store/usersSlice';
+import { addAllUsers, updateOwnUserProfileDepr, User } from '../../store/usersSlice';
 
 const Home = () => {
   const dispatch = useAppDispatch();
@@ -33,7 +33,7 @@ const Home = () => {
           const allUsers = Object.values(usersData) as User[];
           const ownUser = allUsers.find((user) => user.email === ownEmail);
           if (ownUser) {
-            dispatch(updateOwnUserProfile(ownUser))
+            dispatch(updateOwnUserProfileDepr(ownUser))
           }
         }
       } catch (error) {

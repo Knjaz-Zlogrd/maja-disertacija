@@ -33,7 +33,7 @@ export const usersSlice = createSlice({
     addAllUsers: (state, action: PayloadAction<Record<string, User>>) => {
       state.allUsers = action.payload;
     },
-    updateOwnUserProfile: (state, action: PayloadAction<Partial<User>>) => {
+    updateOwnUserProfileDepr: (state, action: PayloadAction<Partial<User>>) => {
       if (state.ownUser) {
         state.ownUser = { ...state.ownUser, ...action.payload };
       } else {
@@ -59,4 +59,4 @@ export const filteredUsers = (
 };
 
 
-export const { addAllUsers, updateOwnUserProfile } = usersSlice.actions;
+export const { addAllUsers, updateOwnUserProfileDepr } = usersSlice.actions;

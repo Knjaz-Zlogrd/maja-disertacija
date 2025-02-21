@@ -3,7 +3,7 @@ import { loginWithEmailAndPassword, register } from '../../auth';
 import { addAuthToken, addOwnEmail, addUID, setError, setLoading } from '../../store/loginSlice';
 import { useAppDispatch, useAppSelector } from '../../store';
 import { useNavigate } from 'react-router-dom';
-import { Roles, Role, updateOwnUserProfile } from '../../store/usersSlice'
+import { Roles, Role, updateOwnUserProfileDepr } from '../../store/usersSlice'
 
 const Login = () => {
   const dispatch = useAppDispatch();

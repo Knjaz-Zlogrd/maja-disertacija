@@ -2,31 +2,56 @@ import React, { useEffect, useState } from 'react';
 import { useAppSelector, useAppDispatch } from '../../store';
 import { updateDoc, doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../../firebaseConfig';
-import { User, updateOwnUserProfile } from '../../store/usersSlice';
+import { User, updateOwnUserProfileDepr } from '../../store/usersSlice';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
+import { axiosPrivate } from '../../auth';
+import { useGetOwnUserProfileQuery, useUpdateOwnUserProfileMutation } from '../../store/api/userApi';
 
 const Profile = () => {
   const dispatch = useAppDispatch();
   const uid = useAppSelector((state) => state.loginSlice.uid);
-  const ownUser = useAppSelector((state) => state.usersSlice.ownUser);
+  // const ownUser = useAppSelector((state) => state.usersSlice.ownUser);
+  const [updateOwnUserProfile] = useUpdateOwnUserProfileMutation();
 
   const [isEditing, setIsEditing] = useState(false);
-  const [editUser, setEditUser] = useState<User | null>(null);
+  const [editUser, setEditUser] = useState<User | undefined>(undefined);
 
-  useEffect(() => {
-    if (uid) {
-      const unsubscribe = onSnapshot(doc(db, 'users', uid), (doc) => {
-        if (doc.exists()) {
-          dispatch(updateOwnUserProfile(doc.data() as User));
-        }
-      }, (error) => {
-        console.error('Error fetching user document:', error);
-      });
-      return () => unsubscribe();
-    }
-  }, [uid, dispatch]);
+  const ownEmail = useAppSelector((state) => state.loginSlice.ownEmail);
+  console.log("ownEmail:", ownEmail);
+  const { data: ownUser, isLoading, error } = useGetOwnUserProfileQuery(ownEmail ?? '', {
+    skip: !ownEmail,
+  });
+  
+  console.log("Loading state:", isLoading);
+  console.log("ownUser:", ownUser);
+  
+  if (isLoading) {
+    console.log('Loading user profile...');
+  }
+  
+  if (error) {
+    console.error('Error fetching user profile:', error);
+  }
+  
+  if (ownUser) {
+    console.log('User profile fetched:', ownUser); // Log the fetched user
+  }
+  
+
+  // useEffect(() => {
+  //   if (uid) {
+  //     const unsubscribe = onSnapshot(doc(db, 'users', uid), (doc) => {
+  //       if (doc.exists()) {
+  //         dispatch(updateOwnUserProfileDepr(doc.data() as User));
+  //       }
+  //     }, (error) => {
+  //       console.error('Error fetching user document:', error);
+  //     });
+  //     return () => unsubscribe();
+  //   }
+  // }, [uid, dispatch]);
 
   const handleEditClick = () => {
     setEditUser(ownUser);
@@ -52,32 +77,66 @@ const Profile = () => {
   //   }
   // };
 
+  // const handleUpdateProfile = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+  
+  //   if (uid && editUser) {
+  //     try {
+  //       // Prepare the `propsToUpdate` object with the updated fields
+  //       const propsToUpdate = {
+  //         firstName: editUser.firstName,
+  //         lastName: editUser.lastName,
+  //         company: editUser.company,
+  //         team: editUser.team,
+  //       };
+  //       console.log(ownUser?.email, 'own user');
+  //       console.log(propsToUpdate, 'props');
+  
+  //       // Send the API request to update the user
+  //       const response = await axiosPrivate.put("/user/update-user", {
+  //         email: ownUser?.email,
+  //         propToUpdate: propsToUpdate,
+  //       });
+  //       console.log("Response status:", response.status);
+  //       console.log("Response data:", response.data);
+  //       // Handle the response
+  //       if (response.status === 200) {
+  //         toast.success("Profile updated successfully");
+  //         setIsEditing(false);
+  //       } else {
+  //         toast.error("Failed to update profile");
+  //       }
+  //     } catch (err) {
+  //       console.error("Failed to update profile", err);
+  //       toast.error("An error occurred while updating the profile");
+  //     }
+  //   }
+  // };
+
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
   
-    if (uid && editUser) {
+    if (uid && editUser && ownUser) {
       try {
-        // Prepare the `propToUpdate` object with the updated fields
-        const propToUpdate = {
-          firstName: editUser.firstName,
-          lastName: editUser.lastName,
-          company: editUser.company,
-          team: editUser.team,
+        // Prepare the data to update
+        const requestBody = {
+          email: ownUser.email,
+          propsToUpdate: {
+            firstName: editUser.firstName,
+            lastName: editUser.lastName,
+            company: editUser.company,
+            team: editUser.team,
+          },
         };
   
-        // Send the API request to update the user
-        const response = await axios.put("/user/update-user", {
-          email: ownUser?.email,
-          propToUpdate,
-        });
+        console.log("Updating user:", requestBody);
   
-        // Handle the response
-        if (response.status === 200) {
-          toast.success("Profile updated successfully");
-          setIsEditing(false);
-        } else {
-          toast.error("Failed to update profile");
-        }
+        // Call RTK Query mutation
+        const response = await updateOwnUserProfile(requestBody).unwrap();
+        console.log(response.data, 'RESP');
+  
+        toast.success("Profile updated successfully");
+        setIsEditing(false);
       } catch (err) {
         console.error("Failed to update profile", err);
         toast.error("An error occurred while updating the profile");
@@ -87,7 +146,7 @@ const Profile = () => {
 
   const handleChange = (field: keyof User, value: string) => {
     setEditUser((prev) => {
-      if (!prev) return null;
+      if (!prev) return undefined;
       return { ...prev, [field]: value };
     });
   };
