@@ -2,18 +2,33 @@ import React, { useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store';
 import { addMeeting, addSelectedUsers } from '../../store/meetingSlice';
 import { filteredUsers } from '../../store/usersSlice';
+import { useGetOwnUserProfileQuery, useGetUsersByCompanyQuery } from '../../store/api/userApi';
 
 const InviteUsersForm = () => {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [selectedUsers, setSelectedUsers] = useState<Set<string>>(new Set());
   const dispatch = useAppDispatch();
 
-  const allUsers = useAppSelector((state) => state.usersSlice.allUsers);
-  const ownUser = useAppSelector((state) => state.usersSlice.ownUser);
   const meeting = useAppSelector((state) => state.meetingSlice.meeting);
 
+  // const allUsers = useAppSelector((state) => state.usersSlice.allUsers);
+  // const ownUser = useAppSelector((state) => state.usersSlice.ownUser);
+
   // Get filtered users
-  const usersToShow = filteredUsers(allUsers, searchTerm, ownUser);
+  // const usersToShow = filteredUsers(allUsers, searchTerm, ownUser);
+
+  const ownEmail = useAppSelector((state) => state.loginSlice.ownEmail);
+    const { data: ownUser } = useGetOwnUserProfileQuery(ownEmail ?? '', {
+      skip: !ownEmail,
+    });
+
+  const { data: users, error, isLoading } = useGetUsersByCompanyQuery(
+    ownUser?.company ? encodeURIComponent(ownUser.company) : "",
+  );
+    
+
+  if (isLoading) return <p>Loading...</p>;
+  if (error) return <p>Error loading users</p>;
 
   const handleGoBack = () => {
     dispatch(addMeeting(undefined));
@@ -32,9 +47,15 @@ const InviteUsersForm = () => {
   };
 
   const handleNext = () => {
-    const selectedUserIds = Object.keys(allUsers).filter((userId) =>
-      selectedUsers.has(allUsers[userId].email)
-    );
+    // const selectedUserIds = Object.keys(allUsers).filter((userId) =>
+    //   selectedUsers.has(allUsers[userId].email)
+    // );
+
+    if (!users) return;
+
+    const selectedUserIds = users
+      .filter((user) => selectedUsers.has(user.email))
+      .map((user) => user.email);
   
     dispatch(addSelectedUsers(selectedUserIds));
   };
@@ -87,8 +108,8 @@ const InviteUsersForm = () => {
             Next
           </button>
         </div>
-        <ul>
-          {usersToShow.map((user, index) => (
+        {/* <ul>
+          {users.map((user, index) => (
             <li
               key={index}
               onClick={() => handleUserClick(user.email)}
@@ -107,7 +128,34 @@ const InviteUsersForm = () => {
               </div>
             </li>
           ))}
-        </ul>
+        </ul> */}
+        <div className="max-h-120 overflow-y-auto border rounded p-2">
+          {users && users.length > 0 ? (
+            <ul>
+              {users.map((user, index) => (
+                <li
+                  key={index}
+                  onClick={() => handleUserClick(user.email)}
+                  style={{ userSelect: "none" }}
+                  className={`mb-2 p-2 border rounded cursor-pointer ${
+                    selectedUsers.has(user.email) ? "bg-green-100" : ""
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span>
+                      {user.firstName} {user.lastName}
+                    </span>
+                    {selectedUsers.has(user.email) && (
+                      <span className="font-bold">✔</span>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-gray-500 text-center">No users found.</p>
+          )}
+        </div>
       </div>
     </div>
   );

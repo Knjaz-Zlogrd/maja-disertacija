@@ -11,6 +11,11 @@ type HttpResponseUser = {
   user: User,
 };
 
+type HttpResponseUsers = {
+  message: string;
+  users: User[];
+};
+
 export const userApi = createApi({
   reducerPath: "userApi",
   baseQuery: fetchBaseQuery({ baseUrl: "http://localhost:5000", }),
@@ -32,7 +37,15 @@ export const userApi = createApi({
       }),
       invalidatesTags: ["User"], // Triggers a refetch of `getOwnUserProfile`
     }),
+    getUsersByCompany: builder.query<User[], string>({
+      query: (company) => `/user/get-users?company=${company}`,
+      transformResponse: (response: HttpResponseUsers) => {
+        console.log("API response:", response);
+        return response.users; // Extract `users` from the response
+      },
+      providesTags: ["User"],
+    }),
   }),
 });
 
-export const { useGetOwnUserProfileQuery, useUpdateOwnUserProfileMutation } = userApi;
+export const { useGetOwnUserProfileQuery, useUpdateOwnUserProfileMutation, useGetUsersByCompanyQuery } = userApi;
