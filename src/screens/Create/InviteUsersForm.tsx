@@ -30,6 +30,13 @@ const InviteUsersForm = () => {
   if (isLoading) return <p>Loading...</p>;
   if (error) return <p>Error loading users</p>;
 
+    // Filter the users based on search term and exclude the ownUser
+    const filteredUsers = users?.filter(
+      (user) =>
+        user.email !== ownUser?.email && 
+        `${user.firstName} ${user.lastName}`.toLowerCase().includes(searchTerm.toLowerCase())
+    ) || [];
+
   const handleGoBack = () => {
     dispatch(addMeeting(undefined));
   };
@@ -130,9 +137,9 @@ const InviteUsersForm = () => {
           ))}
         </ul> */}
         <div className="max-h-120 overflow-y-auto border rounded p-2">
-          {users && users.length > 0 ? (
+          {filteredUsers && filteredUsers.length > 0 ? (
             <ul>
-              {users.map((user, index) => (
+              {filteredUsers.map((user, index) => (
                 <li
                   key={index}
                   onClick={() => handleUserClick(user.email)}
