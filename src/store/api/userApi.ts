@@ -1,5 +1,20 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { User } from "../usersSlice";
+
+export const Roles = {
+  ADMIN: 'admin',
+  USER: 'user',
+} as const;
+
+export type Role = (typeof Roles)[keyof typeof Roles];
+
+export type User = {
+  email: string;
+  userRole: Role;
+  firstName: string;
+  lastName: string;
+  company: string;
+  team: string;
+}
 
 type HttpResponse = {
   message: string,

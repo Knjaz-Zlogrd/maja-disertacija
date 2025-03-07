@@ -1,12 +1,9 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useRouteMatchValue } from './../../hooks/useRouteMatchValue';
-import { signOut } from 'firebase/auth';
-import { auth } from '../../firebaseConfig';
 import { useAppDispatch } from '../../store';
 import { logout } from '../../store/loginSlice';
 import { addMeeting, resetSelectedUsers } from '../../store/meetingSlice';
-import { addAllUsers } from '../../store/usersSlice';
 
 const Navigation = () => {
   const location = useLocation();
@@ -16,10 +13,8 @@ const Navigation = () => {
 
   const handleLogout = async () => {
     try {
-      await signOut(auth);
       dispatch(logout());
       dispatch(addMeeting(undefined));
-      dispatch(addAllUsers({}));
       dispatch(resetSelectedUsers());
     } catch (error) {
       console.error('Failed to logout', error);

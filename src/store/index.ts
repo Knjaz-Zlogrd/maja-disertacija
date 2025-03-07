@@ -7,7 +7,6 @@ import {
 } from "@reduxjs/toolkit";
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 import { loginSlice } from "./loginSlice";
-import { usersSlice } from "./usersSlice";
 import { meetingSlice } from "./meetingSlice";
 import { userApi } from "./api/userApi"; // Import RTK Query API
 import localStorage from "redux-persist/lib/storage";
@@ -25,7 +24,6 @@ const authPersistConfig = {
 
 const rootReducer = combineReducers({
   [loginSlice.name]: persistReducer(authPersistConfig, loginSlice.reducer),
-  [usersSlice.name]: usersSlice.reducer,
   [meetingSlice.name]: meetingSlice.reducer,
   [userApi.reducerPath]: userApi.reducer, // ✅ Add RTK Query API reducer
 });

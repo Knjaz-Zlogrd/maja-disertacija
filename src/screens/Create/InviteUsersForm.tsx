@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store';
 import { addMeeting, addSelectedUsers } from '../../store/meetingSlice';
-import { filteredUsers } from '../../store/usersSlice';
 import { useGetOwnUserProfileQuery, useGetUsersByCompanyQuery } from '../../store/api/userApi';
 
 const InviteUsersForm = () => {
@@ -10,12 +9,6 @@ const InviteUsersForm = () => {
   const dispatch = useAppDispatch();
 
   const meeting = useAppSelector((state) => state.meetingSlice.meeting);
-
-  // const allUsers = useAppSelector((state) => state.usersSlice.allUsers);
-  // const ownUser = useAppSelector((state) => state.usersSlice.ownUser);
-
-  // Get filtered users
-  // const usersToShow = filteredUsers(allUsers, searchTerm, ownUser);
 
   const ownEmail = useAppSelector((state) => state.loginSlice.ownEmail);
     const { data: ownUser } = useGetOwnUserProfileQuery(ownEmail ?? '', {
@@ -57,7 +50,6 @@ const InviteUsersForm = () => {
     // const selectedUserIds = Object.keys(allUsers).filter((userId) =>
     //   selectedUsers.has(allUsers[userId].email)
     // );
-
     if (!users) return;
 
     const selectedUserIds = users
