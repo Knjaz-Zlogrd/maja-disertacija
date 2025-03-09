@@ -59,7 +59,6 @@ const InviteUsersForm = () => {
     dispatch(addSelectedUsers(selectedUserIds));
   };
   
-  console.log('bbb');
   return (
     <div className="p-4 mt-16 max-w-2xl mx-auto">
       <div className="flex items-center justify-between mb-4">

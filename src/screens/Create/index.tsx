@@ -2,7 +2,7 @@ import React from 'react';
 import { useAppSelector } from '../../store';
 import InviteUsersForm from './InviteUsersForm';
 import MeetingForm from './MeetingForm';
-import ScheduleForm from './ScheduleForm';
+import RecurrenceForm from './RecurrenceForm';
 
 const CreateMeeting = () => {
   const meeting = useAppSelector((state) => state.meetingSlice.meeting);
@@ -11,7 +11,7 @@ const CreateMeeting = () => {
   return (
     meeting ? 
       selectedUserIds.length !== 0 ? 
-        <ScheduleForm meeting={meeting} selectedUserIds={selectedUserIds} /> : 
+        <RecurrenceForm meeting={meeting} selectedUserIds={selectedUserIds} /> : 
       <InviteUsersForm /> : 
     <MeetingForm />
   );
