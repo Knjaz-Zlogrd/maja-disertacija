@@ -12,6 +12,8 @@ const RecurrenceForm = ({ meeting, selectedUserIds }: RecurrenceFormProps) => {
   const [recurrence, setRecurrence] = useState<string>("none");
   const [daysOfWeek, setDaysOfWeek] = useState<string[]>([]);
   const [startDate, setStartDate] = useState<string>("");
+  const [surveyStartTime, setSurveyStartTime] = useState<string>("");
+  const [surveyEndTime, setSurveyEndTime] = useState<string>("");
   const dispatch = useAppDispatch();
 
   const toggleDay = (day: string) => {
@@ -27,6 +29,8 @@ const RecurrenceForm = ({ meeting, selectedUserIds }: RecurrenceFormProps) => {
       recurrence,
       daysOfWeek: recurrence === "weekly" ? daysOfWeek : [],
       startDate,
+      surveyStartTime,
+      surveyEndTime,
     });
   };
 
@@ -38,7 +42,7 @@ const RecurrenceForm = ({ meeting, selectedUserIds }: RecurrenceFormProps) => {
     <div className="flex mt-16 justify-center">
       <div className="p-4 bg-white shadow-md rounded-lg w-full max-w-md">
         <h2 className="text-xl font-semibold mb-4">Set Recurrence</h2>
-        
+
         <label className="block text-sm font-medium mb-2">Recurrence Type</label>
         <select 
           className="w-full p-2 border rounded-md" 
@@ -81,6 +85,26 @@ const RecurrenceForm = ({ meeting, selectedUserIds }: RecurrenceFormProps) => {
           />
         </div>
 
+        <div className="mt-4">
+          <label className="block text-sm font-medium mb-2">Survey Start Time</label>
+          <input 
+            type="time" 
+            className="w-full p-2 border rounded-md" 
+            value={surveyStartTime} 
+            onChange={(e) => setSurveyStartTime(e.target.value)}
+          />
+        </div>
+
+        <div className="mt-4">
+          <label className="block text-sm font-medium mb-2">Survey End Time</label>
+          <input 
+            type="time" 
+            className="w-full p-2 border rounded-md" 
+            value={surveyEndTime} 
+            onChange={(e) => setSurveyEndTime(e.target.value)}
+          />
+        </div>
+
         <div className="mt-6 flex gap-4">
           <button 
             onClick={handleSubmit} 
@@ -96,6 +120,7 @@ const RecurrenceForm = ({ meeting, selectedUserIds }: RecurrenceFormProps) => {
           </button>
         </div>
 
+
         {/* Display Selected Users */}
         <div className="mt-6 p-4 bg-gray-100 rounded-md">
           <h3 className="text-lg font-semibold mb-2">Invited Users:</h3>
@@ -109,6 +134,7 @@ const RecurrenceForm = ({ meeting, selectedUserIds }: RecurrenceFormProps) => {
             <p className="text-sm text-gray-500">No users selected.</p>
           )}
         </div>
+
       </div>
     </div>
   );
