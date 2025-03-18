@@ -3,7 +3,7 @@ import { useForm, useFieldArray, SubmitHandler } from 'react-hook-form';
 import { v4 as uuidv4 } from 'uuid';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faChevronDown } from '@fortawesome/free-solid-svg-icons';
-import { addMeeting, Meeting } from '../../store/meetingSlice';
+import { addMeeting, MeetingType } from '../../store/meetingSlice';
 import { useAppDispatch } from '../../store';
 
 const MeetingForm = () => {
@@ -26,7 +26,7 @@ const MeetingForm = () => {
   };
 
   // Initialize form with react-hook-form
-  const { control, handleSubmit, register, reset, setValue, formState: {errors} } = useForm<Meeting>({
+  const { control, handleSubmit, register, reset, setValue, formState: {errors} } = useForm<MeetingType>({
     defaultValues: {
       title: '',
       questions: [{ id: uuidv4(), question: '', type: 'text' }],
@@ -38,7 +38,7 @@ const MeetingForm = () => {
     name: 'questions',
   });
 
-  const onSubmit: SubmitHandler<Meeting> = (data) => {
+  const onSubmit: SubmitHandler<MeetingType> = (data) => {
     console.log(data);
     dispatch(addMeeting(data));
   };

@@ -1,19 +1,21 @@
 import React, { useState } from "react";
-import { Meeting } from "../../store/meetingSlice";
+import { MeetingType } from "../../store/meetingSlice";
 import { useAppDispatch } from "../../store";
 import { resetSelectedUsers } from "../../store/meetingSlice";
+import { Meeting, Recurrence, RecurrenceType, useCreateMeetingMutation } from "../../store/api/meetingApi";
 
-interface RecurrenceFormProps {
-  meeting: Meeting;
+type RecurrenceFormProps = {
+  meeting: MeetingType;
   selectedUserIds: string[];
 }
 
 const RecurrenceForm = ({ meeting, selectedUserIds }: RecurrenceFormProps) => {
-  const [recurrence, setRecurrence] = useState<string>("none");
+  const [recurrence, setRecurrence] = useState<RecurrenceType>("none");
   const [daysOfWeek, setDaysOfWeek] = useState<string[]>([]);
   const [startDate, setStartDate] = useState<string>("");
   const [surveyStartTime, setSurveyStartTime] = useState<string>("");
   const [surveyEndTime, setSurveyEndTime] = useState<string>("");
+  const [createMeeting, { isLoading, error }] = useCreateMeetingMutation();
   const dispatch = useAppDispatch();
 
   const toggleDay = (day: string) => {
@@ -22,16 +24,31 @@ const RecurrenceForm = ({ meeting, selectedUserIds }: RecurrenceFormProps) => {
     );
   };
 
-  const handleSubmit = () => {
-    console.log("Meeting:", meeting);
-    console.log("Selected Users:", selectedUserIds);
-    console.log("Recurrence Settings:", {
-      recurrence,
-      daysOfWeek: recurrence === "weekly" ? daysOfWeek : [],
-      startDate,
-      surveyStartTime,
-      surveyEndTime,
-    });
+  const handleSubmit = async () => {
+    // Construct the meeting data with recurrence details
+    const meetingData: Meeting = {
+      ...meeting, // title and questions from previous steps
+      recurrence: {
+        type: recurrence,
+        daysOfWeek: recurrence === "weekly" ? daysOfWeek : [],
+        startDate,         // Ensure this is in a format acceptable by your backend (e.g., ISO string)
+        surveyStartTime,
+        surveyEndTime,
+      },
+      invitedUsers: selectedUserIds, // array of emails
+    };
+
+    try {
+      const result = await createMeeting(meetingData).unwrap();
+      console.log("Meeting scheduled successfully:", result);
+      // Optionally, display a success message or redirect
+    } catch (err) {
+      console.error("Failed to schedule meeting:", err);
+    }
+  };
+
+  const handleRecurrenceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setRecurrence(e.target.value as RecurrenceType);
   };
 
   const handleGoBack = () => {
@@ -47,7 +64,7 @@ const RecurrenceForm = ({ meeting, selectedUserIds }: RecurrenceFormProps) => {
         <select 
           className="w-full p-2 border rounded-md" 
           value={recurrence} 
-          onChange={(e) => setRecurrence(e.target.value)}
+          onChange={handleRecurrenceChange}
         >
           <option value="none">None</option>
           <option value="daily">Daily</option>

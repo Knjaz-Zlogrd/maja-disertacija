@@ -14,6 +14,7 @@ import {
   persistReducer,
   persistStore,
 } from "redux-persist";
+import { meetingApi } from "./api/meetingApi";
 
 // Persist login state only
 const authPersistConfig = {
@@ -26,6 +27,7 @@ const rootReducer = combineReducers({
   [loginSlice.name]: persistReducer(authPersistConfig, loginSlice.reducer),
   [meetingSlice.name]: meetingSlice.reducer,
   [userApi.reducerPath]: userApi.reducer, // ✅ Add RTK Query API reducer
+  [meetingApi.reducerPath]: meetingApi.reducer, // ✅ Add RTK Query API reducer
 });
 
 // Handle global store reset
@@ -44,7 +46,7 @@ export const storeReset = createAction("store/reset");
 const persistConfig = {
   key: "root",
   storage: localStorage,
-  blacklist: [userApi.reducerPath], // ✅ Do not persist API state
+  blacklist: [userApi.reducerPath, meetingApi.reducerPath], // ✅ Do not persist API state
 };
 
 const persistedReducer = persistReducer(persistConfig, resettableRootReducer);
@@ -52,7 +54,9 @@ const persistedReducer = persistReducer(persistConfig, resettableRootReducer);
 const store = configureStore({
   reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(userApi.middleware), // ✅ Add RTK Query middleware
+    getDefaultMiddleware()
+      .concat(userApi.middleware)
+      .concat(meetingApi.middleware), // ✅ Add RTK Query middleware
 });
 
 export const persistor = persistStore(store);

@@ -6,13 +6,13 @@ export type Question = {
   type: string;
 };
 
-export type Meeting = {
+export type MeetingType = {
   title: string;
   questions: Question[];
 };
 
 export type State = {
-  meeting: Meeting | undefined;
+  meeting: MeetingType | undefined;
   selectedUserIds: string[];
 }
 
@@ -25,7 +25,7 @@ export const meetingSlice = createSlice({
   name: 'meetingSlice',
   initialState,
   reducers: {
-    addMeeting: (state, action: PayloadAction<Meeting | undefined>) => {
+    addMeeting: (state, action: PayloadAction<MeetingType | undefined>) => {
       state.meeting = action.payload;
     },
     addSelectedUsers: (state, action: PayloadAction<string[]>) => {
