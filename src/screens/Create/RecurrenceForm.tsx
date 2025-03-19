@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { MeetingType } from "../../store/meetingSlice";
-import { useAppDispatch } from "../../store";
+import { useAppDispatch, useAppSelector } from "../../store";
 import { resetSelectedUsers } from "../../store/meetingSlice";
 import { Meeting, Recurrence, RecurrenceType, useCreateMeetingMutation } from "../../store/api/meetingApi";
+import { useGetOwnUserProfileQuery } from "../../store/api/userApi";
 
 type RecurrenceFormProps = {
   meeting: MeetingType;
@@ -16,6 +17,10 @@ const RecurrenceForm = ({ meeting, selectedUserIds }: RecurrenceFormProps) => {
   const [surveyStartTime, setSurveyStartTime] = useState<string>("");
   const [surveyEndTime, setSurveyEndTime] = useState<string>("");
   const [createMeeting, { isLoading, error }] = useCreateMeetingMutation();
+  const ownEmail = useAppSelector((state) => state.loginSlice.ownEmail);
+    const { data: ownUser } = useGetOwnUserProfileQuery(ownEmail ?? '', {
+      skip: !ownEmail,
+    });
   const dispatch = useAppDispatch();
 
   const toggleDay = (day: string) => {
@@ -36,6 +41,7 @@ const RecurrenceForm = ({ meeting, selectedUserIds }: RecurrenceFormProps) => {
         surveyEndTime,
       },
       invitedUsers: selectedUserIds, // array of emails
+      meetingOwner: ownEmail ?? '',
     };
 
     try {

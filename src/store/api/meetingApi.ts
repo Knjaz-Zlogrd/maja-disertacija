@@ -17,6 +17,7 @@ export type Meeting = {
   questions: Question[];
   recurrence: Recurrence;
   invitedUsers: string[];
+  meetingOwner: string;
 }
 
 type CreateMeetingResponse = {
