@@ -7,6 +7,7 @@ export type Recurrence = {
   type: RecurrenceType;
   daysOfWeek?: string[];
   startDate: string;       // ISO date string from the date input
+  timeZone: string;
   surveyStartTime: string; // Format "HH:mm"
   surveyEndTime: string;   // Format "HH:mm"
 }

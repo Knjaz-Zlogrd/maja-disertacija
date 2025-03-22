@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { MeetingType } from "../../store/meetingSlice";
 import { useAppDispatch, useAppSelector } from "../../store";
 import { resetSelectedUsers } from "../../store/meetingSlice";
@@ -16,12 +16,16 @@ const RecurrenceForm = ({ meeting, selectedUserIds }: RecurrenceFormProps) => {
   const [startDate, setStartDate] = useState<string>("");
   const [surveyStartTime, setSurveyStartTime] = useState<string>("");
   const [surveyEndTime, setSurveyEndTime] = useState<string>("");
+  const [timeZone, setTimeZone] = useState("");
   const [createMeeting, { isLoading, error }] = useCreateMeetingMutation();
   const ownEmail = useAppSelector((state) => state.loginSlice.ownEmail);
-    const { data: ownUser } = useGetOwnUserProfileQuery(ownEmail ?? '', {
-      skip: !ownEmail,
-    });
   const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    // Capture the browser's time zone
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    setTimeZone(tz);
+  }, []);
 
   const toggleDay = (day: string) => {
     setDaysOfWeek((prev) =>
@@ -36,7 +40,8 @@ const RecurrenceForm = ({ meeting, selectedUserIds }: RecurrenceFormProps) => {
       recurrence: {
         type: recurrence,
         daysOfWeek: recurrence === "weekly" ? daysOfWeek : [],
-        startDate,         // Ensure this is in a format acceptable by your backend (e.g., ISO string)
+        startDate,         // Ensure this is in a format acceptable by backend (e.g., ISO string)
+        timeZone,          // Time zone captured from the client, e.g., "Europe/Belgrade"
         surveyStartTime,
         surveyEndTime,
       },
